@@ -1,6 +1,13 @@
+using DataLayer;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//db reference
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite("Data Source=DBWsFeeed.db"));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
