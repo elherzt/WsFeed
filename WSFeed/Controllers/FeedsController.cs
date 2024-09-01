@@ -1,5 +1,6 @@
 ﻿using DataLayer.Models;
 using DataLayer.Repositories.FeedRepository;
+using DataLayer.Repositories.TopicRepository;
 using DataLayer.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,6 +58,65 @@ namespace WSFeed.Controllers
             return response;
         }
 
-       
+        [HttpGet("GetPublicFeeds")]
+        public async Task<ActionResult<Response>> GetPublicFeeds()
+        {
+            Response response = new Response();
+
+            try
+            {
+               
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+                int userId = (int)getUser.Data;
+
+                response = await _feedRepository.GetPublicAsync(userId);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        [HttpPost("AddTopic")]
+        public async Task<ActionResult<Response>> AddTopic(TopicDTOCreate topicDTO)
+        {
+            Response response = new Response();
+
+            try
+            {
+                var handleInvalidModelState = HandleInvalidModelState();
+                if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(handleInvalidModelState);
+                }
+
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+                int userId = (int)getUser.Data;
+
+                response = await _feedRepository.AddTopicAsync(topicDTO, userId);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+
+
+
     }
 }
