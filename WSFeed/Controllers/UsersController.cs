@@ -1,8 +1,9 @@
 ﻿using DataLayer;
 using DataLayer.Models;
+using DataLayer.Repositories.UserRepository;
+using DataLayer.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using WSFeed.Common;
 
 namespace WSFeed.Controllers
 {
@@ -11,56 +12,47 @@ namespace WSFeed.Controllers
     public class UsersController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public UsersController(AppDbContext context)
+        public UsersController(AppDbContext context, IUserRepository userRepository)
         {
+            _userRepository = userRepository;
             _context = context;
         }
 
-
-        public async Task<ActionResult<Response>> Register(UserDto userDto)
+        [HttpPost("register")]
+        public async Task<ActionResult<Response>> Register(UserDTORegister userDTO)
         {
-
-            Response response = new Response(TypeOfResponse.OK);
-
+            Response response = new Response();
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                   .Select(e => e.ErrorMessage)
+                                   .ToList();
+                    var errorMessage = string.Join(", ", errors);
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = errorMessage;
+                    return Ok(response);
 
+                }
+                User user = new User
+                {
+                    Mail = userDTO.Mail,
+                    Name = userDTO.Name,
+                    Password = userDTO.Password
+                };
+                response = await _userRepository.AddUserAsync(user);
             }
             catch (Exception ex)
             {
                 response.TypeOfResponse = TypeOfResponse.Exception;
                 response.Message = ex.Message;
+                
             }
-            return Ok(response);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new Response
-                {
-                    ResponseType = TypeOfResponse.FailedResponse,
-                    Message = "Invalid data provided.",
-                    Data = null
-                });
-            }
-
-            var user = new User
-            {
-                Name = userDto.Name,
-                Email = userDto.Email,
-                PasswordHash = _passwordHasher.HashPassword(null, userDto.Password), // Cifrar contraseña
-                DateRegistered = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return Ok(new Response
-            {
-                ResponseType = TypeOfResponse.OK,
-                Message = "User registered successfully.",
-                Data = user
-            });
+            
+            return Ok(response);   
         }
     }
 }

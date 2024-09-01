@@ -486,4 +486,6 @@ $RECYCLE.BIN/
 #DataLayer
 DataLayer/DBWsFeeed.db
 DataLayer/DBWsFeeed.db*
-
+*.db
+*.db*
+WSFeed/DBWsFeeed.db
