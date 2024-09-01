@@ -1,9 +1,15 @@
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
+using WSFeed.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+//jwt
+builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+builder.Services.AddScoped<IJWTGenerator, JWTGenerator>();
+
 
 //db reference
 builder.Services.AddDbContext<AppDbContext>(options =>
