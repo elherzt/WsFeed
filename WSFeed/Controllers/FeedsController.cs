@@ -147,6 +147,37 @@ namespace WSFeed.Controllers
             return response;
         }
 
+        [HttpPost("EditFeed")]
+        public async Task<ActionResult<Response>> EditFeed(FeedDTOEdit feedDTO)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Feed edited successfully");
+            try
+            {
+                var handleInvalidModelState = HandleInvalidModelState();
+                if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(handleInvalidModelState);
+                }
+
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+
+                int userId = (int)getUser.Data;
+
+                response = await _feedRepository.EditAsync(feedDTO, userId);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
         [HttpPost("DeleteFeed")]
         public async Task<ActionResult<Response>> DeleteFeed(FeedDTODelete feedDTO)
         {
@@ -206,6 +237,8 @@ namespace WSFeed.Controllers
             }
             return response;
         }
+
+        
 
     }
 }

@@ -21,6 +21,7 @@ namespace DataLayer.Repositories.FeedRepository
         Task<Response> AddTopicAsync(TopicDTOCreate topic, int userID);
         Task<Response> RemoveTopicAsync(int topicID, int userId);
         Task<Response> DeleteAsync(int feedId, int userId);
+        Task<Response> EditAsync(FeedDTOEdit feed, int userId);
     }
 
     public class FeedRepository : IFeedRepository
@@ -358,6 +359,41 @@ namespace DataLayer.Repositories.FeedRepository
                 }
 
                 _context.Topics.Remove(topic);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<Response> EditAsync(FeedDTOEdit feed, int userId)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Feed updated");
+            try
+            {
+                var existingFeed = await GetAsync(feed.Id, userId);
+                if (existingFeed.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return existingFeed;
+                }
+                
+                var feedDB = (Feed)existingFeed.Data;
+
+                if (!String.IsNullOrEmpty(feed.Name)){
+                    feedDB.Name = feed.Name;
+                }
+                if (!String.IsNullOrEmpty(feed.Description)){
+                    feedDB.Description = feed.Description;
+                }
+                if (feed.IsPrivate != null)
+                {
+                    feedDB.IsPrivate = (bool)feed.IsPrivate;
+                }
+
+                _context.Feeds.Update(feedDB);
                 _context.SaveChanges();
             }
             catch (Exception ex)

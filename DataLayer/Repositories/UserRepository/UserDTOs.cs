@@ -18,7 +18,8 @@ namespace DataLayer.Repositories.UserRepository
         [Required(ErrorMessage = "Email field is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Mail { get; set; }
-        
+        public DateTime LastLogin { get; set; }
+
     }
 
     public class UserDTORegister

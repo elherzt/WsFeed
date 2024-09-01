@@ -15,6 +15,7 @@ namespace DataLayer.Repositories.UserRepository
         Task<Response> GetUserByEmailAsync(string email);
         Task<Response> AddUserAsync(User user);
         Task<Response> LoginAsync(User user);
+        Task<Response> SaveLoginDateAsync(User user);
     }
 
     public class UserRepository : IUserRepository
@@ -103,10 +104,21 @@ namespace DataLayer.Repositories.UserRepository
                     return response;
                 }
 
+                var lastLogin = DateTime.Now;
+                var saveLogin = await SaveLoginDateAsync(user);
+
+                if (saveLogin.TypeOfResponse == TypeOfResponse.OK)
+                {
+                    lastLogin = (DateTime)saveLogin.Data;
+                }
+
+
+
                 UserDTOResponse userDTOResponse = new UserDTOResponse();
                 userDTOResponse.Id = userDB.Id;
                 userDTOResponse.Name = userDB.Name;
                 userDTOResponse.Mail = userDB.Mail;
+                userDTOResponse.LastLogin = lastLogin;
                 response.Data = userDTOResponse;
             }
             catch (Exception ex)
@@ -153,6 +165,33 @@ namespace DataLayer.Repositories.UserRepository
             return response;
 
 
+        }
+
+        public async Task<Response> SaveLoginDateAsync(User user)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Login date saved successfully");
+            try
+            {
+                var existingUser = await GetUserByEmailAsync(user.Mail);
+                if (existingUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "User not found";
+                    return response;
+                }
+
+                User userDB = (User)existingUser.Data;
+                DateTime lastLogin = userDB.LastLoginDate.HasValue ? userDB.LastLoginDate.Value : DateTime.Now;
+                response.Data = lastLogin;
+                userDB.LastLoginDate = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
         }
     }
 }

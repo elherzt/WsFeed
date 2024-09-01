@@ -27,6 +27,15 @@ namespace DataLayer.Repositories.FeedRepository
         public int PageSize { get; set; } = 10;
     }
 
+    public class FeedDTOEdit
+    {
+        [Required(ErrorMessage = "Id field is required")]
+        public int Id { get; set; }
+        public string? Name { get; set; }        
+        public string? Description { get; set; }
+        public bool? IsPrivate { get; set; } 
+    }
+
 
     public class FeedDTOResponse
     {
