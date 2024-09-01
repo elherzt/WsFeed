@@ -38,11 +38,13 @@ namespace WSFeed.Controllers
                     Password = userDTO.Password
                 };
                 var existingUser = await _userRepository.LoginAsync(user);
-                if (response.TypeOfResponse == TypeOfResponse.OK)
+                if (existingUser.TypeOfResponse == TypeOfResponse.OK)
                 {
                     var loggedUser = (UserDTOResponse)existingUser.Data;
                     var token = _jWTGenerator.GenerateToken(loggedUser.Id.ToString());
                     response.Data = token;
+
+                    // to do:  save token in db, check if token is valid or cancelled for an admin, add methods for cancel token addd roles etc etc etc....
                 }
                 else
                 {

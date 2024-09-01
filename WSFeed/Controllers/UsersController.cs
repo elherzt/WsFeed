@@ -26,7 +26,7 @@ namespace WSFeed.Controllers
             Response response = new Response();
             try
             {
-                Response handleInvalidModelState = HandleInvalidModelState();
+                var handleInvalidModelState = HandleInvalidModelState();
                 if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
                 {
                     return Ok(handleInvalidModelState);
