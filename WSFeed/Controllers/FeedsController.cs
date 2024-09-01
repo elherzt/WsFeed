@@ -121,6 +121,33 @@ namespace WSFeed.Controllers
 
 
 
+        [HttpGet("GetUserFeeds")]
+        public async Task<ActionResult<Response>> GetUserFeeds(int PageNumber = 1, int PageSize = 10)
+        {
+            Response response = new Response();
+
+            try
+            {
+
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+                int userId = (int)getUser.Data;
+
+                response = await _feedRepository.GetUserFeedsAsync(userId, PageNumber, PageSize);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+
 
     }
 }
