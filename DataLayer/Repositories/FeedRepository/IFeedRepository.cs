@@ -42,7 +42,15 @@ namespace DataLayer.Repositories.FeedRepository
 
                 await _context.Feeds.AddAsync(feed);
                 await _context.SaveChangesAsync();
-                response.Data = feed;
+                
+                FeedDTOResponse feedDTOResponse = new FeedDTOResponse();
+                feedDTOResponse.Id = feed.Id;
+                feedDTOResponse.Name = feed.Name;
+                feedDTOResponse.Description = feed.Description;
+                feedDTOResponse.IsPrivate = feed.IsPrivate;
+                feedDTOResponse.TopicsCount = 0;
+
+                response.Data = feedDTOResponse;
 
             }
             catch (Exception ex)
@@ -58,7 +66,7 @@ namespace DataLayer.Repositories.FeedRepository
             Response response = new Response(TypeOfResponse.OK, "Feed found");
             try
             {
-                var feed = await _context.Feeds.Where(f => f.UserId == userId && f.Name == feedName).FirstOrDefaultAsync();
+                var feed = await _context.Feeds.Include(x=> x.Topics).Where(f => f.UserId == userId && f.Name == feedName).FirstOrDefaultAsync();
                 if (feed == null)
                 {
                     response.TypeOfResponse = TypeOfResponse.NotFound;

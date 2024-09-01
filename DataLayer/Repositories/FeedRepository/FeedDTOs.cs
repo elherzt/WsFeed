@@ -17,4 +17,13 @@ namespace DataLayer.Repositories.FeedRepository
 
         public bool IsPrivate { get; set; } = false;
     }
+
+    public class FeedDTOResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool IsPrivate { get; set; }
+        public int TopicsCount { get; set; }
+    }
 }
