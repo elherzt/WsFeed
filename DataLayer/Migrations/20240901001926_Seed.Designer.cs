@@ -3,6 +3,7 @@ using System;
 using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240901001926_Seed")]
+    partial class Seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -42,16 +45,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Feeds");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "All about sports",
-                            IsPrivate = false,
-                            Name = "Sports",
-                            UserId = 1
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Models.Topic", b =>
@@ -76,78 +69,6 @@ namespace DataLayer.Migrations
                     b.HasIndex("FeedId");
 
                     b.ToTable("Topics");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Swimming News",
-                            FeedId = 1,
-                            Name = "Swimming"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Cycling News",
-                            FeedId = 1,
-                            Name = "Cycling"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Tennis News",
-                            FeedId = 1,
-                            Name = "Tennis"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Boxing News",
-                            FeedId = 1,
-                            Name = "Boxing"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Shooting News",
-                            FeedId = 1,
-                            Name = "Shooting"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Description = "Equestrian News",
-                            FeedId = 1,
-                            Name = "Equestrian"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Description = "Jumping News",
-                            FeedId = 1,
-                            Name = "Jumping"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Description = "Sailing News",
-                            FeedId = 1,
-                            Name = "Sailing"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Description = "Rhythmic News",
-                            FeedId = 1,
-                            Name = "Rhythmic"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Description = "Gymnastics News",
-                            FeedId = 1,
-                            Name = "Gymnastics"
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Models.User", b =>
@@ -177,17 +98,6 @@ namespace DataLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedDate = new DateTime(2024, 9, 1, 0, 29, 59, 377, DateTimeKind.Utc).AddTicks(9460),
-                            LastLoginDate = new DateTime(2024, 9, 1, 0, 29, 59, 377, DateTimeKind.Utc).AddTicks(9461),
-                            Mail = "kiosko@example.com",
-                            Name = "Pedro Paramo",
-                            Password = "$2a$11$rxziVW5vnCWEh74E0RfTR.ybxTCWX4LHiUUPN3amac7ZuZproWiOK"
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Models.UserFeed", b =>
