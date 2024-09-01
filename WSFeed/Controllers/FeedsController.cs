@@ -61,7 +61,7 @@ namespace WSFeed.Controllers
         }
 
         [HttpGet("GetPublicFeeds")]
-        public async Task<ActionResult<Response>> GetPublicFeeds()
+        public async Task<ActionResult<Response>> GetPublicFeeds(int PageNumber = 1, int PageSize = 10)
         {
             Response response = new Response();
 
@@ -75,7 +75,7 @@ namespace WSFeed.Controllers
                 }
                 int userId = (int)getUser.Data;
 
-                response = await _feedRepository.GetPublicAsync(userId);
+                response = await _feedRepository.GetPublicAsync(userId, PageNumber, PageSize);
 
             }
             catch (Exception ex)

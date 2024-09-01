@@ -21,6 +21,12 @@ namespace DataLayer.Repositories.FeedRepository
         public bool IsPrivate { get; set; } = false;
     }
 
+    public class FeedDTOPublicSearch()
+    {
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
 
     public class FeedDTOResponse
     {

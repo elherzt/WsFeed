@@ -17,7 +17,7 @@ namespace DataLayer.Repositories.FeedRepository
         Task<Response> GetUserFeedsAsync(int userId);
         Task<Response> CreateAsync(Feed feed);
         Task<Response> GetAsync(int feedId, int userId);
-        Task<Response> GetPublicAsync(int userId);
+        Task<Response> GetPublicAsync(int userId, int pageNumber = 1, int pageSize = 10);
         Task<Response> AddTopicAsync(TopicDTOCreate topic, int userID);
     }
 
@@ -157,13 +157,51 @@ namespace DataLayer.Repositories.FeedRepository
         }
 
 
-        public async Task<Response> GetPublicAsync(int userId)
+        public async Task<Response> GetPublicAsync(int userId, int pageNumber = 1, int pageSize = 10)
         {
             Response response = new Response(TypeOfResponse.OK, "Feeds found");
             try
             {
-                var feeds = await _context.Feeds.Include(x=> x.Topics).Where(f => f.IsPrivate == false && f.UserId != userId).Select(x=> new FeedDTOResponse(x)).ToListAsync();
-                response.Data = feeds;
+                if (pageNumber < 1 || pageSize < 1)
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "Invalid pagination settings";
+                    return response;
+                }
+
+                int skip = (pageNumber - 1) * pageSize;
+                int totalFeeds = await _context.Feeds.CountAsync(f => f.IsPrivate == false && f.UserId != userId);
+                int totalPages = (int)Math.Ceiling(totalFeeds / (double)pageSize);
+                int itemPerPage = pageSize;
+
+                if (skip >= totalFeeds)
+                {
+                    response.Message = "No records, check pagination settings";
+                    response.Data = new
+                    {
+                        TotalRecords = totalFeeds,
+                        CurrentPage = pageNumber,
+                        TotalPages = totalPages,
+                        ItemsPerPage = itemPerPage,
+                        Feeds = new List<FeedDTOResponse>()
+                    };
+                    return response;
+                }
+
+
+                var feeds = await _context.Feeds.Include(x=> x.Topics).Where(f => f.IsPrivate == false && f.UserId != userId)
+                    .Skip(skip)  
+                    .Take(pageSize)
+                    .Select(x=> new FeedDTOResponse(x)).ToListAsync();
+
+                response.Data = new 
+                {
+                    TotalRecords = totalFeeds,
+                    CurrentPage = pageNumber,
+                    TotalPages = totalPages,
+                    ItemsPerPage = itemPerPage,
+                    Feeds = feeds
+                };
             }
             catch (Exception ex)
             {
