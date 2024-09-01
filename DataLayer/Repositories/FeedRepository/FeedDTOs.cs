@@ -10,7 +10,7 @@ namespace DataLayer.Repositories.FeedRepository
 {
     public class FeedDTOcreate
     {
-       
+
 
         [Required(ErrorMessage = "Name field is required")]
         public string Name { get; set; }
@@ -50,6 +50,12 @@ namespace DataLayer.Repositories.FeedRepository
         public bool IsPrivate { get; set; }
         public int TopicsCount { get; set; }
         public string Topics { get; set; }
+    }
+
+    public class FeedDTODelete
+    {
+        [Required(ErrorMessage = "Id field is required")]
+        public int Id { get; set; }
     }
 }
 

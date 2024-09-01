@@ -19,6 +19,8 @@ namespace DataLayer.Repositories.FeedRepository
         Task<Response> GetAsync(int feedId, int userId);
         Task<Response> GetPublicAsync(int userId, int pageNumber = 1, int pageSize = 10);
         Task<Response> AddTopicAsync(TopicDTOCreate topic, int userID);
+        Task<Response> RemoveTopicAsync(int topicID, int userId);
+        Task<Response> DeleteAsync(int feedId, int userId);
     }
 
     public class FeedRepository : IFeedRepository
@@ -318,6 +320,52 @@ namespace DataLayer.Repositories.FeedRepository
             return response;
         }
 
-        
+        public async Task<Response> DeleteAsync(int feedId, int userId)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Feed deleted");
+            try
+            {
+                var existingFeed = await GetAsync(feedId, userId);
+                if (existingFeed.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return existingFeed;
+                }
+
+                Feed feed = (Feed)existingFeed.Data;
+                _context.Feeds.Remove(feed);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+
+        }
+
+        public async Task<Response> RemoveTopicAsync(int topicID, int userId)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Topic removed");
+            try
+            {
+                var topic = await _context.Topics.Include(x=> x.Feed).Where(x => x.Id == topicID && x.Feed.UserId == userId).FirstOrDefaultAsync();
+                if (topic == null)
+                {
+                    response.TypeOfResponse = TypeOfResponse.NotFound;
+                    response.Message = "Topic not found";
+                    return response;
+                }
+
+                _context.Topics.Remove(topic);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
     }
 }
