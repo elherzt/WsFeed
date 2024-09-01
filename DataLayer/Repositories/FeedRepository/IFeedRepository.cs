@@ -97,7 +97,7 @@ namespace DataLayer.Repositories.FeedRepository
             Response response = new Response(TypeOfResponse.OK, "Feed found");
             try
             {
-                var feed = await _context.Feeds.Include(x=> x.Topics).Where(f => f.UserId == userId && f.Name == feedName).FirstOrDefaultAsync();
+                var feed = await _context.Feeds.Include(x=> x.Topics).Where(f => f.UserId == userId && f.Name.ToUpper() == feedName.ToUpper()).FirstOrDefaultAsync();
                 if (feed == null)
                 {
                     response.TypeOfResponse = TypeOfResponse.NotFound;

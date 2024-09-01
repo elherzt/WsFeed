@@ -27,6 +27,8 @@ namespace WSFeed.Controllers
 
             try
             {
+                feedDTO.Name = feedDTO.Name.Trim();
+                feedDTO.Description = feedDTO.Description.Trim();
                 var handleInvalidModelState = HandleInvalidModelState();
                 if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
                 {
@@ -91,6 +93,8 @@ namespace WSFeed.Controllers
 
             try
             {
+                topicDTO.Name = topicDTO.Name.Trim();
+                topicDTO.Description = topicDTO.Description.Trim();
                 var handleInvalidModelState = HandleInvalidModelState();
                 if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
                 {
