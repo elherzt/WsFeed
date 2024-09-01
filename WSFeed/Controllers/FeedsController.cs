@@ -19,7 +19,7 @@ namespace WSFeed.Controllers
             _feedRepository = feedRepository;
         }
 
-        [HttpPost("add")]
+        [HttpPost("Create")]
         public async Task<ActionResult<Response>> Create(FeedDTOcreate feedDTO)
         {
             Response response = new Response();
