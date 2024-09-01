@@ -39,4 +39,10 @@ namespace DataLayer.Repositories.TopicRepository
         public string Description { get; set; }
         public int FeedId { get; set; }
     }
+
+    public class TopicDTODelete
+    {
+        [Required(ErrorMessage = "Id field is required")]
+        public int Id { get; set; }
+    }
 }

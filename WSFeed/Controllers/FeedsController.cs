@@ -177,7 +177,35 @@ namespace WSFeed.Controllers
             return response;
         }
 
+        [HttpPost("DeleteTopic")]
+        public async Task<ActionResult<Response>> DeleteTopic(TopicDTODelete topicDTO)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Feed deleted successfully");
+            try
+            {
+                var handleInvalidModelState = HandleInvalidModelState();
+                if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(handleInvalidModelState);
+                }
 
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+                int userId = (int)getUser.Data;
+
+                response = await _feedRepository.RemoveTopicAsync(topicDTO.Id, userId);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
 
     }
 }
