@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,9 +10,19 @@ namespace WSFeed.Security
     {
         string GenerateToken(string userId);
     }
+
     public class JWTGenerator : IJWTGenerator
     {
         private readonly JWTConfig _jwtconfig;
+
+        public JWTGenerator(IOptions<JWTConfig> jwtConfig)
+        {
+            _jwtconfig = jwtConfig.Value ?? throw new ArgumentNullException(nameof(jwtConfig));
+        }
+
+
+
+
         public string GenerateToken(string userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -1,6 +1,7 @@
 using DataLayer;
 using DataLayer.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using WSFeed.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,10 +19,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //jwt
+//builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
+//builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<JWTConfig>>().Value);
 builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
 builder.Services.AddScoped<IJWTGenerator, JWTGenerator>();
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers(); 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

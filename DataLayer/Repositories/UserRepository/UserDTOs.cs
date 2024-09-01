@@ -36,4 +36,14 @@ namespace DataLayer.Repositories.UserRepository
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 8 characters long")]
         public string Password { get; set; }
     }
+
+    public class UserDTOLogin
+    {
+        [Required]
+        [EmailAddress]
+        public string Mail { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
 }

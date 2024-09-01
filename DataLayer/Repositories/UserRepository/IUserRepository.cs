@@ -14,6 +14,7 @@ namespace DataLayer.Repositories.UserRepository
         Task<Response> GetUserByIdAsync(int userId);
         Task<Response> GetUserByEmailAsync(string email);
         Task<Response> AddUserAsync(User user);
+        Task<Response> LoginAsync(User user);
     }
 
     public class UserRepository : IUserRepository
@@ -78,6 +79,44 @@ namespace DataLayer.Repositories.UserRepository
 
             return response;
             
+        }
+
+        public async Task<Response> LoginAsync(User user)
+        {
+            Response response = new Response(TypeOfResponse.OK, "User found");
+
+            try
+            {
+                var existingUser = await GetUserByEmailAsync(user.Mail);
+                if (existingUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "User not found";
+                    return response;
+                }
+
+                User userDB = (User)existingUser.Data;
+                if (!Cryptography.Verify(user.Password, userDB.Password))
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "Invalid password";
+                    return response;
+                }
+
+                UserDTOResponse userDTOResponse = new UserDTOResponse();
+                userDTOResponse.Id = userDB.Id;
+                userDTOResponse.Name = userDB.Name;
+                userDTOResponse.Mail = userDB.Mail;
+                response.Data = userDTOResponse;
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+
+            return response;
+
         }
 
         public async Task<Response> AddUserAsync(User user)

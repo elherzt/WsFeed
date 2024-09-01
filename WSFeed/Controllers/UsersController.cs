@@ -9,7 +9,7 @@ namespace WSFeed.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : Controller
+    public class UsersController : CustomController
     {
         private readonly AppDbContext _context;
         private readonly IUserRepository _userRepository;
@@ -20,23 +20,19 @@ namespace WSFeed.Controllers
             _context = context;
         }
 
-        [HttpPost("register")]
+        [HttpPost("Register")]
         public async Task<ActionResult<Response>> Register(UserDTORegister userDTO)
         {
             Response response = new Response();
             try
             {
-                if (!ModelState.IsValid)
+                Response handleInvalidModelState = HandleInvalidModelState();
+                if (handleInvalidModelState.TypeOfResponse != TypeOfResponse.OK)
                 {
-                    var errors = ModelState.Values.SelectMany(v => v.Errors)
-                                   .Select(e => e.ErrorMessage)
-                                   .ToList();
-                    var errorMessage = string.Join(", ", errors);
-                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
-                    response.Message = errorMessage;
-                    return Ok(response);
-
+                    return Ok(handleInvalidModelState);
                 }
+
+               
                 User user = new User
                 {
                     Mail = userDTO.Mail,
