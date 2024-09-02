@@ -11,16 +11,21 @@ namespace DataLayer
 {
     public class AppDbContext : DbContext
     {
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Feed> Feeds { get; set; }
         public DbSet<Topic> Topics { get; set; }
         public DbSet<UserFeed> UserFeeds { get; set; }
 
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data Source=DBWsFeeed.db");
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlite("Data Source=DBWsFeeed.db");
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

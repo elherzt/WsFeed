@@ -13,7 +13,7 @@ namespace DataLayer.Utilities
             return BCrypt.Net.BCrypt.HashPassword(text);
         }
 
-        public bool Verify(string text, string securedText)
+        public static bool Verify(string text, string securedText)
         {
             return BCrypt.Net.BCrypt.Verify(text, securedText);
         }

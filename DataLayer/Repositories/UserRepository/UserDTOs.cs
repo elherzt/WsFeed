@@ -5,12 +5,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataLayer.Models
+namespace DataLayer.Repositories.UserRepository
 {
-    public class User
+    public class UserDTOResponse
     {
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Name field is required")]
+        [StringLength(70, ErrorMessage = "Name cannot be longer than 70 characters")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Email field is required")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string Mail { get; set; }
+        public DateTime LastLogin { get; set; }
+
+    }
+
+    public class UserDTORegister
+    {
+       
         [Required(ErrorMessage = "Name field is required")]
         [StringLength(70, ErrorMessage = "Name cannot be longer than 70 characters")]
         public string Name { get; set; }
@@ -22,14 +36,15 @@ namespace DataLayer.Models
         [Required(ErrorMessage = "Password field is required")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 8 characters long")]
         public string Password { get; set; }
-        
+    }
 
+    public class UserDTOLogin
+    {
+        [Required]
+        [EmailAddress]
+        public string Mail { get; set; }
 
-        public DateTime CreatedDate { get; set; }
-
-        public DateTime? LastLoginDate { get; set; }
-
-        public ICollection<Feed> Feeds { get; set; }
-        public ICollection<UserFeed> FollowedFeeds { get; set; }
+        [Required]
+        public string Password { get; set; }
     }
 }
