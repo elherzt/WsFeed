@@ -22,6 +22,7 @@ namespace DataLayer.Repositories.FeedRepository
         Task<Response> RemoveTopicAsync(int topicID, int userId);
         Task<Response> DeleteAsync(int feedId, int userId);
         Task<Response> EditAsync(FeedDTOEdit feed, int userId);
+        Task<Response> CanFetchNewsAsync(Feed feed);
     }
 
     public class FeedRepository : IFeedRepository
@@ -395,6 +396,44 @@ namespace DataLayer.Repositories.FeedRepository
 
                 _context.Feeds.Update(feedDB);
                 _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
+
+        public async Task<Response> CanFetchNewsAsync(Feed feed)
+        {
+            Response response = new Response(TypeOfResponse.OK, "Success");
+            try
+            {
+                var existingFeed = await _context.Feeds.Include(x => x.Topics).FirstOrDefaultAsync(x => x.Id == feed.Id);
+                if (existingFeed == null)
+                {
+                    response.TypeOfResponse = TypeOfResponse.NotFound;
+                    response.Message = "Feed not found";
+                    return response;
+                }
+
+                if (existingFeed.IsPrivate && existingFeed.UserId != feed.UserId)
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "Feed is private";
+                    return response;
+                }
+
+                if (existingFeed.Topics.Count == 0)
+                {
+                    response.TypeOfResponse = TypeOfResponse.FailedResponse;
+                    response.Message = "No topics to fetch news";
+                    return response;
+                }
+
+                var topics = string.Join("+", existingFeed.Topics.Select(t => t.Name));
+                response.Data = topics;
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using DataLayer.Repositories.TopicRepository;
 using DataLayer.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WSFeed.Common;
 
 namespace WSFeed.Controllers
 {
@@ -14,10 +15,12 @@ namespace WSFeed.Controllers
     {
 
         private readonly IFeedRepository _feedRepository;
+        private readonly INewsCalls _newsCalls;
 
-        public FeedsController(IFeedRepository feedRepository)
+        public FeedsController(IFeedRepository feedRepository, INewsCalls newsCalls)
         {
             _feedRepository = feedRepository;
+            _newsCalls = newsCalls;
         }
 
         [HttpPost("Create")]
@@ -179,7 +182,7 @@ namespace WSFeed.Controllers
         }
 
         [HttpPost("DeleteFeed")]
-        public async Task<ActionResult<Response>> DeleteFeed(FeedDTODelete feedDTO)
+        public async Task<ActionResult<Response>> DeleteFeed(FeedDTOId feedDTO)
         {
             Response response = new Response(TypeOfResponse.OK, "Feed deleted successfully");
             try
@@ -238,7 +241,44 @@ namespace WSFeed.Controllers
             return response;
         }
 
-        
+        [HttpGet("GetNews")]
+        public async Task<ActionResult<Response>> GetNews(int feedId)
+        {
+            Response response = new Response();
+
+            try
+            {
+
+                var getUser = GetUserIdFromToken();
+                if (getUser.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return Ok(getUser);
+                }
+                int userId = (int)getUser.Data;
+
+                Feed feed = new Feed();
+                feed.Id = feedId;
+                feed.UserId = userId;
+
+                response = await _feedRepository.CanFetchNewsAsync(feed);
+
+                if (response.TypeOfResponse != TypeOfResponse.OK)
+                {
+                    return response;
+                }
+
+                string topics = (string)response.Data;
+
+                response = await _newsCalls.FetchNewsAsync(topics);
+
+            }
+            catch (Exception ex)
+            {
+                response.TypeOfResponse = TypeOfResponse.Exception;
+                response.Message = ex.Message;
+            }
+            return response;
+        }
 
     }
 }

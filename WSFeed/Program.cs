@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WSFeed.Common;
 using WSFeed.Security;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,9 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFeedRepository, FeedRepository>();
 
+//services
+builder.Services.AddScoped<INewsCalls, NewsCalls>();
+
 //jwt
-//builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
-//builder.Services.AddSingleton(resolver => resolver.GetRequiredService<IOptions<JWTConfig>>().Value);
 builder.Services.Configure<JWTConfig>(builder.Configuration.GetSection("JWTConfig"));
 builder.Services.AddScoped<IJWTGenerator, JWTGenerator>();
 
